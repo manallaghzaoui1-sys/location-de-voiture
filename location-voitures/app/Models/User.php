@@ -17,6 +17,11 @@ class User extends Authenticatable
         'password',
         'telephone',
         'adresse',
+        'role',
+        'cin',
+        'numero_permis',
+        'cin_document_path',
+        'permis_document_path',
     ];
 
     protected $hidden = [
@@ -28,4 +33,14 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
 }

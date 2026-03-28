@@ -1,80 +1,87 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Gestion des véhicules')
+@section('title', 'Véhicules')
 
 @section('content')
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1><i class="fas fa-car"></i> Gestion des véhicules</h1>
-        <a href="{{ route('admin.cars.create') }}" class="btn btn-success">
-            <i class="fas fa-plus"></i> Ajouter un véhicule
-        </a>
+<div class="admin-panel mb-3">
+    <div class="admin-panel-head">
+        <h5 class="mb-0">Gestion des véhicules</h5>
+        <a href="{{ route('admin.cars.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Ajouter</a>
     </div>
-    
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
+
+    <form method="GET" class="row g-2 mt-1">
+        <div class="col-md-4">
+            <input type="text" name="search" class="form-control" placeholder="Marque / modèle" value="{{ $search ?? '' }}">
         </div>
-    @endif
-    
+        <div class="col-md-3">
+            <select name="fuel" class="form-select">
+                <option value="">Tous carburants</option>
+                @foreach($fuelOptions as $option)
+                    <option value="{{ $option }}" @selected(($fuel ?? '') === $option)>{{ $option }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="availability" class="form-select">
+                <option value="">Disponibilité</option>
+                <option value="1" @selected(($availability ?? '') === '1')>Disponible</option>
+                <option value="0" @selected(($availability ?? '') === '0')>Indisponible</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-outline-primary">Filtrer</button>
+        </div>
+    </form>
+</div>
+
+<div class="admin-panel">
     <div class="table-responsive">
-        <table class="table table-bordered table-hover">
-            <thead class="table-dark">
+        <table class="table align-middle mb-0">
+            <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>#</th>
                     <th>Image</th>
-                    <th>Marque</th>
-                    <th>Modèle</th>
-                    <th>Année</th>
+                    <th>Véhicule</th>
                     <th>Carburant</th>
                     <th>Prix/jour</th>
-                    <th>Disponible</th>
-                    <th>Actions</th>
+                    <th>Disponibilité</th>
+                    <th class="text-end">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($cars as $car)
+                @forelse($cars as $car)
                     <tr>
                         <td>{{ $car->id }}</td>
+                        <td><img src="{{ $car->image_url }}" width="62" height="62" class="rounded" style="object-fit:cover" alt="car"></td>
                         <td>
-                            @if($car->image)
-                                <img src="{{ asset('storage/' . $car->image) }}" width="50" height="50" style="object-fit: cover;">
-                            @else
-                                <img src="https://via.placeholder.com/50x50" width="50">
-                            @endif
+                            <strong>{{ $car->marque }} {{ $car->modele }}</strong><br>
+                            <small class="text-muted">Année {{ $car->annee }}</small>
                         </td>
-                        <td>{{ $car->marque }}</td>
-                        <td>{{ $car->modele }}</td>
-                        <td>{{ $car->annee }}</td>
                         <td>{{ $car->carburant }}</td>
-                        <td>{{ $car->prix_par_jour }} DH</td>
+                        <td>{{ number_format($car->prix_par_jour, 2) }} DH</td>
                         <td>
                             @if($car->disponible)
-                                <span class="badge bg-success">Oui</span>
+                                <span class="badge bg-success">Disponible</span>
                             @else
-                                <span class="badge bg-danger">Non</span>
+                                <span class="badge bg-danger">Indisponible</span>
                             @endif
                         </td>
-                        <td>
-                            <a href="{{ route('admin.cars.edit', $car->id) }}" class="btn btn-sm btn-warning">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form action="{{ route('admin.cars.destroy', $car->id) }}" method="POST" class="d-inline">
+                        <td class="text-end">
+                            <a href="{{ route('admin.cars.edit', $car->id) }}" class="btn btn-sm btn-outline-warning"><i class="fas fa-pen"></i></a>
+                            <form action="{{ route('admin.cars.destroy', $car->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Supprimer ce véhicule ')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer cette voiture?')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
                             </form>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr><td colspan="7" class="text-center text-muted py-4">Aucun véhicule trouvé.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>
-    
-    <div class="d-flex justify-content-center">
-        {{ $cars->links() }}
-    </div>
+
+    <div class="pt-3 d-flex justify-content-center">{{ $cars->links() }}</div>
 </div>
 @endsection

@@ -2,16 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCarRequest;
+use App\Http\Requests\StoreCityRequest;
+use App\Http\Requests\UpdateCarRequest;
+use App\Http\Requests\UpdateCityRequest;
 use App\Models\Car;
+use App\Models\City;
 use App\Models\Reservation;
+use App\Models\User;
+use App\Services\ContractPdfService;
+use App\Services\ImageStorageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
+    public function __construct(
+        private readonly ImageStorageService $imageStorageService,
+        private readonly ContractPdfService $contractPdfService,
+    ) {
+        $this->middleware('auth:admin');
     }
 
     public function index()
@@ -19,18 +29,56 @@ class AdminController extends Controller
         $totalCars = Car::count();
         $totalReservations = Reservation::count();
         $pendingReservations = Reservation::where('statut', 'en_attente')->count();
-        $recentReservations = Reservation::with(['user', 'car'])
-            ->orderBy('created_at', 'desc')
+        $confirmedReservations = Reservation::where('statut', 'confirme')->count();
+        $monthlyRevenue = Reservation::whereIn('statut', ['confirme', 'termine'])
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('prix_total');
+        $recentReservations = Reservation::with(['user', 'car', 'city'])
+            ->orderByDesc('created_at')
             ->limit(5)
             ->get();
-        
-        return view('admin.dashboard', compact('totalCars', 'totalReservations', 'pendingReservations', 'recentReservations'));
+
+        return view('admin.dashboard', compact(
+            'totalCars',
+            'totalReservations',
+            'pendingReservations',
+            'confirmedReservations',
+            'monthlyRevenue',
+            'recentReservations'
+        ));
     }
 
-    public function indexCars()
+    public function indexCars(Request $request)
     {
-        $cars = Car::orderBy('created_at', 'desc')->paginate(10);
-        return view('admin.cars.index', compact('cars'));
+        $validated = $request->validate([
+            'search' => ['nullable', 'string', 'max:100'],
+            'availability' => ['nullable', 'in:0,1'],
+            'fuel' => ['nullable', 'string', 'max:60'],
+        ]);
+
+        $search = trim((string) ($validated['search'] ?? ''));
+        $availability = (string) ($validated['availability'] ?? '');
+        $fuel = trim((string) ($validated['fuel'] ?? ''));
+
+        $cars = Car::query()
+            ->when($search !== '', fn ($query) => $query->where(function ($nested) use ($search) {
+                $nested->where('marque', 'like', "%{$search}%")
+                    ->orWhere('modele', 'like', "%{$search}%");
+            }))
+            ->when($availability !== '', fn ($query) => $query->where('disponible', $availability === '1'))
+            ->when($fuel !== '', fn ($query) => $query->where('carburant', $fuel))
+            ->orderByDesc('created_at')
+            ->paginate(10)
+            ->withQueryString();
+
+        $fuelOptions = Car::query()
+            ->select('carburant')
+            ->distinct()
+            ->orderBy('carburant')
+            ->pluck('carburant');
+
+        return view('admin.cars.index', compact('cars', 'search', 'availability', 'fuel', 'fuelOptions'));
     }
 
     public function create()
@@ -38,93 +86,153 @@ class AdminController extends Controller
         return view('admin.cars.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreCarRequest $request)
     {
-        $request->validate([
-            'marque' => 'required',
-            'modele' => 'required',
-            'annee' => 'required|integer|min:1990|max:' . date('Y'),
-            'carburant' => 'required',
-            'prix_par_jour' => 'required|integer|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'description' => 'nullable'
-        ]);
+        $data = $request->validated();
+        $data['disponible'] = $request->boolean('disponible');
 
-        $data = $request->all();
-        
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('cars', 'public');
-            $data['image'] = $path;
+            $data['image'] = $this->imageStorageService->storeCarImage($request->file('image'));
         }
-        
+
         Car::create($data);
-        
+
         return redirect()->route('admin.cars.index')
-            ->with('success', 'Voiture ajoutée avec succès!');
+            ->with('success', 'Voiture ajoutée avec succès.');
     }
 
     public function edit($id)
     {
         $car = Car::findOrFail($id);
+
         return view('admin.cars.edit', compact('car'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateCarRequest $request, $id)
     {
         $car = Car::findOrFail($id);
-        
-        $request->validate([
-            'marque' => 'required',
-            'modele' => 'required',
-            'annee' => 'required|integer',
-            'carburant' => 'required',
-            'prix_par_jour' => 'required|integer',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'disponible' => 'boolean'
-        ]);
 
-        $data = $request->all();
-        
+        $data = $request->validated();
+        $data['disponible'] = $request->boolean('disponible');
+
         if ($request->hasFile('image')) {
-            if ($car->image) {
-                Storage::disk('public')->delete($car->image);
-            }
-            $path = $request->file('image')->store('cars', 'public');
-            $data['image'] = $path;
+            $this->imageStorageService->deletePublicFile($car->image);
+            $data['image'] = $this->imageStorageService->storeCarImage($request->file('image'));
         }
-        
+
         $car->update($data);
-        
+
         return redirect()->route('admin.cars.index')
-            ->with('success', 'Voiture modifiée avec succès!');
+            ->with('success', 'Voiture modifiée avec succès.');
     }
 
     public function destroy($id)
     {
         $car = Car::findOrFail($id);
-        if ($car->image) {
-            Storage::disk('public')->delete($car->image);
-        }
+        $this->imageStorageService->deletePublicFile($car->image);
         $car->delete();
-        
+
         return redirect()->route('admin.cars.index')
-            ->with('success', 'Voiture supprimée avec succès!');
+            ->with('success', 'Voiture supprimée avec succès.');
     }
 
-    public function reservations()
+    public function reservations(Request $request)
     {
-        $reservations = Reservation::with(['user', 'car'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
-        
-        return view('admin.reservations', compact('reservations'));
+        $validated = $request->validate([
+            'search' => ['nullable', 'string', 'max:120'],
+            'status' => ['nullable', 'in:en_attente,confirme,annule,termine'],
+            'city_id' => ['nullable', 'integer', 'exists:cities,id'],
+            'date_from' => ['nullable', 'date'],
+            'date_to' => ['nullable', 'date', 'after_or_equal:date_from'],
+        ]);
+
+        $search = trim((string) ($validated['search'] ?? ''));
+        $status = (string) ($validated['status'] ?? '');
+        $cityId = (string) ($validated['city_id'] ?? '');
+        $dateFrom = (string) ($validated['date_from'] ?? '');
+        $dateTo = (string) ($validated['date_to'] ?? '');
+
+        $reservations = Reservation::with(['user', 'car', 'city'])
+            ->when($search !== '', fn ($query) => $query->where(function ($nested) use ($search) {
+                $nested->where('contract_reference', 'like', "%{$search}%")
+                    ->orWhereHas('user', fn ($userQuery) => $userQuery->where('name', 'like', "%{$search}%"));
+            }))
+            ->when($status !== '', fn ($query) => $query->where('statut', $status))
+            ->when($cityId !== '', fn ($query) => $query->where('city_id', $cityId))
+            ->when($dateFrom !== '', fn ($query) => $query->whereDate('date_debut', '>=', $dateFrom))
+            ->when($dateTo !== '', fn ($query) => $query->whereDate('date_fin', '<=', $dateTo))
+            ->orderByDesc('created_at')
+            ->paginate(15)
+            ->withQueryString();
+
+        $cities = City::where('is_active', true)->orderBy('name')->get(['id', 'name']);
+
+        return view('admin.reservations.index', compact('reservations', 'search', 'status', 'cityId', 'dateFrom', 'dateTo', 'cities'));
     }
 
     public function updateReservationStatus(Request $request, $id)
     {
+        $validated = $request->validate([
+            'statut' => ['required', 'in:en_attente,confirme,annule,termine'],
+        ]);
+
         $reservation = Reservation::findOrFail($id);
-        $reservation->update(['statut' => $request->statut]);
-        
-        return back()->with('success', 'Statut mis à jour avec succès!');
+        $this->authorize('updateStatus', $reservation);
+        $reservation->update($validated);
+
+        return back()->with('success', 'Statut mis à jour avec succès.');
+    }
+
+    public function citiesIndex()
+    {
+        $cities = City::orderBy('name')->paginate(15);
+
+        return view('admin.cities.index', compact('cities'));
+    }
+
+    public function citiesStore(StoreCityRequest $request)
+    {
+        $payload = $request->validated();
+        $payload['is_active'] = $request->boolean('is_active');
+
+        City::create($payload);
+
+        return back()->with('success', 'Ville ajoutée avec succès.');
+    }
+
+    public function citiesUpdate(UpdateCityRequest $request, City $city)
+    {
+        $payload = $request->validated();
+        $payload['is_active'] = $request->boolean('is_active');
+
+        $city->update($payload);
+
+        return back()->with('success', 'Ville mise à jour avec succès.');
+    }
+
+    public function citiesDestroy(City $city)
+    {
+        if ($city->reservations()->exists()) {
+            return back()->with('error', 'Impossible de supprimer une ville déjà utilisée dans une réservation.');
+        }
+
+        $city->delete();
+
+        return back()->with('success', 'Ville supprimée avec succès.');
+    }
+
+    public function downloadContract(Reservation $reservation)
+    {
+        return $this->contractPdfService->downloadResponse($reservation);
+    }
+
+    public function downloadClientDocument(User $user, string $type)
+    {
+        abort_unless(in_array($type, ['cin', 'permis'], true), 404);
+
+        $path = $type === 'cin' ? $user->cin_document_path : $user->permis_document_path;
+        abort_if(! $path || ! Storage::disk('local')->exists($path), 404);
+
+        return response()->download(Storage::disk('local')->path($path));
     }
 }

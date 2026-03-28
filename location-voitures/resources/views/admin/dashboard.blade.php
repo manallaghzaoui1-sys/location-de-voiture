@@ -1,120 +1,87 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Tableau de bord Admin')
+@section('title', 'Dashboard')
 
 @section('content')
-<div class="container py-5">
-    <div class="row">
-        <div class="col-md-12">
-            <h1><i class="fas fa-tachometer-alt"></i> Tableau de bord</h1>
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="admin-stat-card">
+            <span>Total véhicules</span>
+            <strong>{{ $totalCars }}</strong>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-stat-card">
+            <span>Total réservations</span>
+            <strong>{{ $totalReservations }}</strong>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-stat-card">
+            <span>En attente</span>
+            <strong>{{ $pendingReservations }}</strong>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-stat-card">
+            <span>CA du mois</span>
+            <strong>{{ number_format($monthlyRevenue, 2) }} DH</strong>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="admin-panel">
+            <div class="admin-panel-head">
+                <h5 class="mb-0">Dernières réservations</h5>
+                <a href="{{ route('admin.reservations') }}" class="btn btn-sm btn-outline-primary">Voir tout</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Référence</th>
+                            <th>Client</th>
+                            <th>Voiture</th>
+                            <th>Total</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($recentReservations as $reservation)
+                            <tr>
+                                <td>{{ $reservation->contract_reference ?? 'N/A' }}</td>
+                                <td>{{ $reservation->user->name }}</td>
+                                <td>{{ $reservation->car->marque }} {{ $reservation->car->modele }}</td>
+                                <td>{{ number_format($reservation->prix_total, 2) }} DH</td>
+                                <td>
+                                    <span class="badge {{ $reservation->statut === 'confirme' ? 'bg-success' : ($reservation->statut === 'en_attente' ? 'bg-warning text-dark' : ($reservation->statut === 'termine' ? 'bg-info' : 'bg-danger')) }}">
+                                        {{ ucfirst(str_replace('_', ' ', $reservation->statut)) }}
+                                    </span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="5" class="text-center text-muted py-4">Aucune réservation.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="admin-panel">
+            <h5>Actions rapides</h5>
+            <div class="d-grid gap-2 mt-3">
+                <a href="{{ route('admin.cars.create') }}" class="btn btn-primary">Ajouter un véhicule</a>
+                <a href="{{ route('admin.cars.index') }}" class="btn btn-outline-primary">Gérer véhicules</a>
+                <a href="{{ route('admin.reservations') }}" class="btn btn-outline-primary">Gérer réservations</a>
+                <a href="{{ route('admin.cities.index') }}" class="btn btn-outline-primary">Gérer villes</a>
+            </div>
             <hr>
-        </div>
-    </div>
-    
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card text-white bg-primary">
-                <div class="card-body">
-                    <h5 class="card-title">Total Véhicules</h5>
-                    <h2>{{ $totalCars }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-success">
-                <div class="card-body">
-                    <h5 class="card-title">Total Réservations</h5>
-                    <h2>{{ $totalReservations }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-warning">
-                <div class="card-body">
-                    <h5 class="card-title">Réservations en attente</h5>
-                    <h2>{{ $pendingReservations }}</h2>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Dernières réservations</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                32<tr>
-                                    <th>Client</th>
-                                    <th>Voiture</th>
-                                    <th>Dates</th>
-                                    <th>Total</th>
-                                    <th>Statut</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($recentReservations as $reservation)
-                                    <tr>
-                                        <td>{{ $reservation->user->name }}</td>
-                                        <td>{{ $reservation->car->marque }} {{ $reservation->car->modele }}</td>
-                                        <td>{{ $reservation->date_debut }} → {{ $reservation->date_fin }}</td>
-                                        <td>{{ $reservation->prix_total }} DH</td>
-                                        <td>
-                                            @if($reservation->statut == 'en_attente')
-                                                <span class="badge bg-warning">En attente</span>
-                                            @elseif($reservation->statut == 'confirme')
-                                                <span class="badge bg-success">Confirmé</span>
-                                            @else
-                                                <span class="badge bg-danger">Annulé</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <form action="{{ route('admin.reservation.status', $reservation->id) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                @method('PUT')
-                                                <select name="statut" class="form-select form-select-sm" onchange="this.form.submit()">
-                                                    <option value="en_attente" {{ $reservation->statut == 'en_attente' ? 'selected' : '' }}>En attente</option>
-                                                    <option value="confirme" {{ $reservation->statut == 'confirme' ? 'selected' : '' }}>Confirmé</option>
-                                                    <option value="annule" {{ $reservation->statut == 'annule' ? 'selected' : '' }}>Annulé</option>
-                                                </select>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6" class="text-center">Aucune réservation</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Gestion rapide</h5>
-                </div>
-                <div class="card-body">
-                    <a href="{{ route('admin.cars.index') }}" class="btn btn-primary">
-                        <i class="fas fa-car"></i> Gérer les véhicules
-                    </a>
-                    <a href="{{ route('admin.reservations') }}" class="btn btn-info">
-                        <i class="fas fa-calendar-check"></i> Toutes les réservations
-                    </a>
-                    <a href="{{ route('admin.cars.create') }}" class="btn btn-success">
-                        <i class="fas fa-plus"></i> Ajouter un véhicule
-                    </a>
-                </div>
+            <div class="small text-muted">
+                Réservations confirmées: <strong>{{ $confirmedReservations }}</strong>
             </div>
         </div>
     </div>

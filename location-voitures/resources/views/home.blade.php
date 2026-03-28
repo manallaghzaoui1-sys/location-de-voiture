@@ -1,57 +1,66 @@
-@extends('layouts.app')
+@extends('layouts.client')
+
+@section('title', 'Accueil')
 
 @section('content')
 <div class="hero-section">
-    <div class="container">
-        <h1><i class="fas fa-car"></i> AutoLoc</h1>
-        <p class="lead">La meilleure solution pour la location de voitures au Maroc</p>
-        <a href="{{ route('cars.index') }}" class="btn btn-light btn-lg">
+    <div class="container text-center">
+        <h1 class="display-5 fw-bold"><i class="fas fa-car"></i> AutoLoc</h1>
+        <p class="lead mb-4">Location de voitures fiable, rapide et transparente partout au Maroc.</p>
+        <a href="{{ route('cars.index') }}" class="btn btn-light btn-lg px-4">
             <i class="fas fa-search"></i> Voir nos véhicules
         </a>
     </div>
 </div>
 
-<div class="container">
-    <div class="row">
-        <div class="col-12 text-center mb-5">
-            <h2>Pourquoi choisir AutoLoc ?</h2>
-            <p>Des services de qualité pour votre mobilité</p>
-        </div>
+<div class="container pb-3">
+    <div class="text-center mb-4">
+        <h2 class="section-title">Pourquoi choisir AutoLoc </h2>
+        <p class="section-subtitle">Une expérience de location claire, professionnelle et sécurisée.</p>
     </div>
-    
-    <div class="row">
-        <div class="col-md-4 text-center mb-4">
-            <i class="fas fa-car-side fa-3x text-primary mb-3"></i>
-            <h4>Large choix</h4>
-            <p>Plusieurs modèles disponibles pour tous les besoins</p>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="feature-card text-center">
+                <div class="feature-icon"><i class="fas fa-car-side"></i></div>
+                <h5>Large choix de véhicules</h5>
+                <p class="mb-0 text-muted">Citadines, SUV et berlines disponibles selon vos besoins.</p>
+            </div>
         </div>
-        <div class="col-md-4 text-center mb-4">
-            <i class="fas fa-tachometer-alt fa-3x text-primary mb-3"></i>
-            <h4>Prix compétitifs</h4>
-            <p>Les meilleurs prix du marché avec transparence</p>
+        <div class="col-md-4">
+            <div class="feature-card text-center">
+                <div class="feature-icon"><i class="fas fa-money-bill-wave"></i></div>
+                <h5>Tarifs transparents</h5>
+                <p class="mb-0 text-muted">Prix/jour clair, frais de ville visibles et total calculé en direct.</p>
+            </div>
         </div>
-        <div class="col-md-4 text-center mb-4">
-            <i class="fas fa-headset fa-3x text-primary mb-3"></i>
-            <h4>Support 24/7</h4>
-            <p>Assistance client dédiée 7 jours sur 7</p>
+        <div class="col-md-4">
+            <div class="feature-card text-center">
+                <div class="feature-icon"><i class="fas fa-file-signature"></i></div>
+                <h5>Contrat PDF instantané</h5>
+                <p class="mb-0 text-muted">Confirmation par email et téléchargement du contrat dès validation.</p>
+            </div>
         </div>
-    </div>
-    
-    <div class="row mt-4">
-        <div class="col-md-4 text-center mb-4">
-            <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
-            <h4>Assurance incluse</h4>
-            <p>Tous nos véhicules sont assurés</p>
+        <div class="col-md-4">
+            <div class="feature-card text-center">
+                <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                <h5>Sécurité et confiance</h5>
+                <p class="mb-0 text-muted">Informations clients protégées et accès administrateur isolé.</p>
+            </div>
         </div>
-        <div class="col-md-4 text-center mb-4">
-            <i class="fas fa-calendar-check fa-3x text-primary mb-3"></i>
-            <h4>Réservation facile</h4>
-            <p>Réservez en quelques clics</p>
+        <div class="col-md-4">
+            <div class="feature-card text-center">
+                <div class="feature-icon"><i class="fas fa-calendar-check"></i></div>
+                <h5>Réservation simple</h5>
+                <p class="mb-0 text-muted">Choisissez vos dates et votre ville en quelques clics.</p>
+            </div>
         </div>
-        <div class="col-md-4 text-center mb-4">
-            <i class="fas fa-map-marker-alt fa-3x text-primary mb-3"></i>
-            <h4>Livraison gratuite</h4>
-            <p>Livraison à votre adresse</p>
+        <div class="col-md-4">
+            <div class="feature-card text-center">
+                <div class="feature-icon"><i class="fas fa-headset"></i></div>
+                <h5>Support réactif</h5>
+                <p class="mb-0 text-muted">Notre équipe reste disponible pour vos demandes importantes.</p>
+            </div>
         </div>
     </div>
 </div>

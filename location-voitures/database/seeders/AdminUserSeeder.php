@@ -10,12 +10,17 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::create([
-            'name' => 'Admin',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('admin123'),
-            'telephone' => '0612345678',
-            'adresse' => 'Casablanca, Maroc'
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Admin',
+                'password' => Hash::make('admin123'),
+                'telephone' => '0612345678',
+                'adresse' => 'Casablanca, Maroc',
+                'role' => 'admin',
+                'cin' => 'ADMIN-CIN',
+                'numero_permis' => 'ADMIN-PERMIS',
+            ]
+        );
     }
 }

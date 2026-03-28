@@ -19,6 +19,10 @@ return new class extends Migration
             $table->boolean('disponible')->default(true);
             $table->text('description')->nullable();
             $table->timestamps();
+
+            $table->index(['disponible', 'created_at'], 'cars_available_created_idx');
+            $table->index('carburant', 'cars_fuel_idx');
+            $table->index(['disponible', 'carburant', 'created_at'], 'cars_available_fuel_created_idx');
         });
     }
 

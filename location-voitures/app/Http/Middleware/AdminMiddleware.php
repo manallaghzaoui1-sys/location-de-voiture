@@ -11,10 +11,12 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->email === 'admin@example.com') {
+        $admin = Auth::guard('admin')->user() ?? Auth::user();
+
+        if ($admin && $admin->isAdmin()) {
             return $next($request);
         }
-        
-        return redirect('/')->with('error', 'Accès non autorisé.');
+
+        return redirect()->route('admin.login')->with('error', 'Accès administrateur non autorisé.');
     }
 }

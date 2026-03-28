@@ -17,3 +17,7 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+/.composer
+*.sql
+server.log
+server-error.log

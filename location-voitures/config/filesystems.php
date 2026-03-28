@@ -44,6 +44,14 @@ return [
             'throw' => false,
         ],
 
+        'car_images' => [
+            'driver' => 'local',
+            'root' => public_path('images/images_voiture'),
+            'url' => env('APP_URL').'/images/images_voiture',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

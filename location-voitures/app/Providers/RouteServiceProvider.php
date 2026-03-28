@@ -18,13 +18,34 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
+        RateLimiter::for('login', function (Request $request) {
+            return Limit::perMinute(5)->by(strtolower((string) $request->input('email')) . '|' . $request->ip());
+        });
+
+        RateLimiter::for('admin-login', function (Request $request) {
+            return Limit::perMinute(5)->by(strtolower((string) $request->input('email')) . '|admin|' . $request->ip());
+        });
+
+        RateLimiter::for('register', function (Request $request) {
+            return Limit::perMinute(4)->by($request->ip());
+        });
+
+        RateLimiter::for('reservation-submit', function (Request $request) {
+            $userKey = $request->user()?->id ?: $request->ip();
+
+            return Limit::perMinute(12)->by('reservation|' . $userKey);
+        });
+
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
 
             Route::middleware('web')
-                ->group(base_path('routes/web.php'));
+                ->group(base_path('routes/client.php'));
+
+            Route::middleware('web')
+                ->group(base_path('routes/admin.php'));
         });
     }
 }

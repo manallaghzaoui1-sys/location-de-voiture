@@ -59,6 +59,8 @@ return [
 
     'asset_url' => env('ASSET_URL'),
 
+    'security_headers_enabled' => (bool) env('SECURITY_HEADERS_ENABLED', true),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

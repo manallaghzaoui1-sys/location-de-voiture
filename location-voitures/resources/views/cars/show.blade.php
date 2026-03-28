@@ -1,60 +1,81 @@
-@extends('layouts.app')
+@extends('layouts.client')
 
 @section('title', $car->marque . ' ' . $car->modele)
 
 @section('content')
 <div class="container py-5">
-    <div class="row">
-        <div class="col-md-6">
-            @if($car->image)
-                <img src="{{ asset('storage/' . $car->image) }}" class="img-fluid rounded shadow" alt="{{ $car->marque }}">
-            @else
-                <img src="https://via.placeholder.com/600x400?text={{ $car->marque }}+{{ $car->modele }}" class="img-fluid rounded shadow" alt="Voiture">
-            @endif
-        </div>
-        <div class="col-md-6">
-            <h1>{{ $car->marque }} {{ $car->modele }}</h1>
-            <p class="lead">{{ $car->description ?: 'Description non disponible' }}</p>
-            
-            <table class="table table-bordered mt-4">
-                <tr>
-                    <th><i class="fas fa-calendar-alt"></i> Année</th>
-                    <td>{{ $car->annee }}</td>
-                </tr>
-                <tr>
-                    <th><i class="fas fa-gas-pump"></i> Carburant</th>
-                    <td>{{ $car->carburant }}</td>
-                </tr>
-                <tr>
-                    <th><i class="fas fa-cogs"></i> Transmission</th>
-                    <td>Manuelle</td>
-                </tr>
-                <tr>
-                    <th><i class="fas fa-users"></i> Places</th>
-                    <td>5</td>
-                </tr>
-            </table>
-            
-            <div class="alert alert-info text-center">
-                <h3>{{ $car->prix_par_jour }} DH <small>/ jour</small></h3>
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="panel-card p-3">
+                <img src="{{ $car->image_url }}" class="img-fluid rounded" alt="{{ $car->marque }} {{ $car->modele }}">
             </div>
-            
-            @auth
-                @if($car->disponible)
-                    <a href="{{ route('reservation.create', $car->id) }}" class="btn btn-primary btn-lg w-100">
-                        <i class="fas fa-calendar-check"></i> Réserver maintenant
-                    </a>
-                @else
-                    <div class="alert alert-warning text-center">
-                        <i class="fas fa-clock"></i> Cette voiture n'est pas disponible actuellement
-                    </div>
-                @endif
-            @else
-                <div class="alert alert-warning text-center">
-                    <i class="fas fa-sign-in-alt"></i> 
-                    <a href="{{ route('login') }}">Connectez-vous</a> pour réserver cette voiture
+        </div>
+
+        <div class="col-lg-6">
+            <div class="panel-card p-4 h-100">
+                <h1 class="h2 mb-2">{{ $car->marque }} {{ $car->modele }}</h1>
+                <p class="text-muted mb-4">{{ $car->description ?? 'Description non disponible pour ce v?hicule.' }}</p>
+
+                <div class="info-grid mb-4">
+                    <div class="info-row"><span><i class="fas fa-calendar-alt"></i> Année</span><strong>{{ $car->annee }}</strong></div>
+                    <div class="info-row"><span><i class="fas fa-gas-pump"></i> Carburant</span><strong>{{ $car->carburant }}</strong></div>
+                    <div class="info-row"><span><i class="fas fa-money-bill-wave"></i> Prix / jour</span><strong>{{ number_format($car->prix_par_jour, 2) }} DH</strong></div>
                 </div>
-            @endauth
+
+                @auth('web')
+                    @if($car->disponible)
+                        <a href="{{ route('reservation.create', $car->id) }}" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-calendar-check"></i> Réserver maintenant
+                        </a>
+                    @else
+                        <div class="alert alert-warning mb-0 text-center">Ce véhicule n'est pas disponible actuellement.</div>
+                    @endif
+                @else
+                    <div class="border rounded p-3 bg-light">
+                        <h5 class="mb-3">Créer un compte pour réserver ce véhicule</h5>
+                        <form method="POST" action="{{ route('register.post') }}" class="row g-2">
+                            @csrf
+                            <input type="hidden" name="redirect_to" value="{{ route('reservation.create', $car->id, false) }}">
+
+                            <div class="col-12">
+                                <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" placeholder="Nom complet" value="{{ old('name') }}" required>
+                            </div>
+
+                            <div class="col-12">
+                                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="Email" value="{{ old('email') }}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <input type="text" name="telephone" class="form-control @error('telephone') is-invalid @enderror" placeholder="Téléphone" value="{{ old('telephone') }}">
+                            </div>
+
+                            <div class="col-md-6">
+                                <input type="text" name="cin" class="form-control @error('cin') is-invalid @enderror" placeholder="CIN" value="{{ old('cin') }}" required>
+                            </div>
+
+                            <div class="col-12">
+                                <input type="text" name="numero_permis" class="form-control @error('numero_permis') is-invalid @enderror" placeholder="Numéro de permis" value="{{ old('numero_permis') }}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Mot de passe" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <input type="password" name="password_confirmation" class="form-control" placeholder="Confirmer mot de passe" required>
+                            </div>
+
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100" type="submit">Créer le compte et continuer</button>
+                            </div>
+                        </form>
+
+                        <div class="text-center mt-2">
+                            <small>Déjà inscrit <a href="{{ route('login') }}">Connectez-vous</a></small>
+                        </div>
+                    </div>
+                @endauth
+            </div>
         </div>
     </div>
 </div>

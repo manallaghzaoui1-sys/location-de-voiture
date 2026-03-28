@@ -17,7 +17,7 @@ class CarSeeder extends Seeder
                 'carburant' => 'Essence',
                 'prix_par_jour' => 250,
                 'description' => 'Voiture compacte idéale pour la ville, économique et facile à garer.',
-                'disponible' => true
+                'disponible' => true,
             ],
             [
                 'marque' => 'Peugeot',
@@ -26,7 +26,7 @@ class CarSeeder extends Seeder
                 'carburant' => 'Diesel',
                 'prix_par_jour' => 280,
                 'description' => 'Design moderne et confortable, parfaite pour les longs trajets.',
-                'disponible' => true
+                'disponible' => true,
             ],
             [
                 'marque' => 'Dacia',
@@ -35,7 +35,7 @@ class CarSeeder extends Seeder
                 'carburant' => 'Essence',
                 'prix_par_jour' => 200,
                 'description' => 'Rapport qualité-prix exceptionnel, spacieuse et fiable.',
-                'disponible' => true
+                'disponible' => true,
             ],
             [
                 'marque' => 'Volkswagen',
@@ -44,7 +44,7 @@ class CarSeeder extends Seeder
                 'carburant' => 'Essence',
                 'prix_par_jour' => 350,
                 'description' => 'Berline compacte premium, alliant confort et performance.',
-                'disponible' => true
+                'disponible' => true,
             ],
             [
                 'marque' => 'Toyota',
@@ -53,7 +53,7 @@ class CarSeeder extends Seeder
                 'carburant' => 'Hybride',
                 'prix_par_jour' => 400,
                 'description' => 'Berline confortable et économique, technologie hybride.',
-                'disponible' => true
+                'disponible' => true,
             ],
             [
                 'marque' => 'BMW',
@@ -62,12 +62,15 @@ class CarSeeder extends Seeder
                 'carburant' => 'Diesel',
                 'prix_par_jour' => 600,
                 'description' => 'Luxe et performance, une expérience de conduite exceptionnelle.',
-                'disponible' => true
-            ]
+                'disponible' => true,
+            ],
         ];
-        
+
         foreach ($cars as $car) {
-            Car::create($car);
+            Car::updateOrCreate(
+                ['marque' => $car['marque'], 'modele' => $car['modele'], 'annee' => $car['annee']],
+                $car
+            );
         }
     }
 }

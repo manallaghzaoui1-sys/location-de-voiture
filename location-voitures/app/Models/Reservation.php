@@ -10,15 +10,25 @@ class Reservation extends Model
     protected $fillable = [
         'user_id', 
         'car_id', 
+        'city_id',
         'date_debut', 
         'date_fin', 
         'prix_total', 
-        'statut'
+        'statut',
+        'contract_reference',
+        'prix_location',
+        'frais_deplacement',
+        'contract_pdf_path',
+        'email_sent_at',
     ];
 
     protected $casts = [
         'date_debut' => 'date',
         'date_fin' => 'date',
+        'prix_total' => 'float',
+        'prix_location' => 'float',
+        'frais_deplacement' => 'float',
+        'email_sent_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
@@ -29,6 +39,11 @@ class Reservation extends Model
     public function car(): BelongsTo
     {
         return $this->belongsTo(Car::class);
+    }
+
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class);
     }
 
     public function getNombreJoursAttribute()
