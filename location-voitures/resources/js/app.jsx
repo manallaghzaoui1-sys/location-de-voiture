@@ -68,16 +68,28 @@ function initProfessionalMotion() {
 }
 
 const carsCatalogRoot = document.getElementById('cars-catalog-root');
-if (carsCatalogRoot) {
-    const detailsBaseUrl = carsCatalogRoot.dataset.detailsUrl || '/car';
+let carsCatalogMounted = false;
+let reservationPricingMounted = false;
+
+function mountCarsCatalog() {
+    if (carsCatalogMounted) {
+        return false;
+    }
+
+    const root = document.getElementById('cars-catalog-root');
+    if (!root) {
+        return false;
+    }
+
+    const detailsBaseUrl = root.dataset.detailsUrl || '/car';
     const carsDataScript = document.getElementById('cars-catalog-data');
     let cars = [];
 
     try {
         if (carsDataScript?.textContent) {
             cars = JSON.parse(carsDataScript.textContent);
-        } else if (carsCatalogRoot.dataset.cars) {
-            cars = JSON.parse(carsCatalogRoot.dataset.cars);
+        } else if (root.dataset.cars) {
+            cars = JSON.parse(root.dataset.cars);
         }
 
         if (!Array.isArray(cars)) {
@@ -88,18 +100,27 @@ if (carsCatalogRoot) {
         cars = [];
     }
 
-    createRoot(carsCatalogRoot).render(<CarsCatalog cars={cars} detailsBaseUrl={detailsBaseUrl} />);
-    requestAnimationFrame(initProfessionalMotion);
+    createRoot(root).render(<CarsCatalog cars={cars} detailsBaseUrl={detailsBaseUrl} />);
+    carsCatalogMounted = true;
+    return true;
 }
 
-const reservationPricingRoot = document.getElementById('reservation-pricing-root');
-if (reservationPricingRoot) {
-    const pricePerDay = parseFloat(reservationPricingRoot.dataset.pricePerDay || '0');
-    const dateStartInputId = reservationPricingRoot.dataset.dateStartInputId || 'date_debut';
-    const dateEndInputId = reservationPricingRoot.dataset.dateEndInputId || 'date_fin';
-    const citySelectId = reservationPricingRoot.dataset.citySelectId || 'city_id';
+function mountReservationPricing() {
+    if (reservationPricingMounted) {
+        return false;
+    }
 
-    createRoot(reservationPricingRoot).render(
+    const root = document.getElementById('reservation-pricing-root');
+    if (!root) {
+        return false;
+    }
+
+    const pricePerDay = parseFloat(root.dataset.pricePerDay || '0');
+    const dateStartInputId = root.dataset.dateStartInputId || 'date_debut';
+    const dateEndInputId = root.dataset.dateEndInputId || 'date_fin';
+    const citySelectId = root.dataset.citySelectId || 'city_id';
+
+    createRoot(root).render(
         <ReservationPriceCalculator
             pricePerDay={pricePerDay}
             dateStartInputId={dateStartInputId}
@@ -107,11 +128,27 @@ if (reservationPricingRoot) {
             citySelectId={citySelectId}
         />
     );
-    requestAnimationFrame(initProfessionalMotion);
+
+    reservationPricingMounted = true;
+    return true;
+}
+
+function mountWidgets() {
+    const didMountCarsCatalog = mountCarsCatalog();
+    const didMountReservationPricing = mountReservationPricing();
+
+    if (didMountCarsCatalog || didMountReservationPricing) {
+        requestAnimationFrame(initProfessionalMotion);
+    }
 }
 
 if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mountWidgets);
     document.addEventListener('DOMContentLoaded', initProfessionalMotion);
 } else {
+    mountWidgets();
     initProfessionalMotion();
 }
+
+window.addEventListener('load', mountWidgets, { once: true });
+window.setTimeout(mountWidgets, 0);
