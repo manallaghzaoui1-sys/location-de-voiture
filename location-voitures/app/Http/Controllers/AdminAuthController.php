@@ -31,7 +31,7 @@ class AdminAuthController extends Controller
             Auth::guard('admin')->logout();
 
             return back()->withErrors([
-                'email' => 'Accès administrateur refusé.',
+                'email' => 'Acces administrateur refuse.',
             ]);
         }
 
@@ -41,9 +41,13 @@ class AdminAuthController extends Controller
     public function logout(Request $request)
     {
         Auth::guard('admin')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        Auth::guard('web')->logout();
 
-        return redirect()->route('admin.login')->with('success', 'Session admin fermée.');
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
+        return redirect()->route('admin.login')->with('success', 'Session admin fermee.');
     }
 }

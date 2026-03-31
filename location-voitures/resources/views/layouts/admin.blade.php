@@ -47,9 +47,7 @@
         <main class="admin-main">
             <header class="admin-topbar">
                 <h1>@yield('title', 'Back-office')</h1>
-                <form method="POST" action="{{ route('admin.logout') }}">@csrf
-                    <button class="btn btn-sm btn-outline-danger">Deconnexion admin</button>
-                </form>
+                <a href="{{ route('admin.logout.get') }}" class="btn btn-sm btn-outline-danger">Deconnexion admin</a>
             </header>
 
             <section class="admin-content">

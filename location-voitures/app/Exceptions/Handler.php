@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Session\TokenMismatchException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
@@ -22,6 +23,16 @@ class Handler extends ExceptionHandler
 
     public function register(): void
     {
+        $this->renderable(function (TokenMismatchException $e, $request) {
+            if ($request->is('admin') || $request->is('admin/*')) {
+                return redirect()->route('admin.login')
+                    ->with('error', 'Session expiree. Reconnectez-vous.');
+            }
+
+            return redirect()->route('login')
+                ->with('error', 'Session expiree. Reessayez.');
+        });
+
         $this->reportable(function (Throwable $e) {
             // Keep full technical details in logs only.
             Log::error('Unhandled exception', [
@@ -32,6 +43,16 @@ class Handler extends ExceptionHandler
 
         $this->renderable(function (Throwable $e, $request) {
             $status = $e instanceof HttpExceptionInterface ? $e->getStatusCode() : 500;
+
+            if ($status === 419 && ! $request->expectsJson()) {
+                if ($request->is('admin') || $request->is('admin/*')) {
+                    return redirect()->route('admin.login')
+                        ->with('error', 'Session expiree. Reconnectez-vous.');
+                }
+
+                return redirect()->route('login')
+                    ->with('error', 'Session expiree. Reessayez.');
+            }
 
             if ($request->expectsJson()) {
                 return response()->json([

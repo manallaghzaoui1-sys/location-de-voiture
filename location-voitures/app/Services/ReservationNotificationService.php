@@ -10,10 +10,17 @@ use Illuminate\Support\Facades\Mail;
 
 class ReservationNotificationService
 {
+    private function reservationMailer(): string
+    {
+        return (string) config('mail.reservation_mailer', 'failover');
+    }
+
     public function sendReservationConfirmation(Reservation $reservation): bool
     {
         try {
-            Mail::to($reservation->user->email)->send(new ReservationConfirmedMail($reservation));
+            Mail::mailer($this->reservationMailer())
+                ->to($reservation->user->email)
+                ->send(new ReservationConfirmedMail($reservation));
             $reservation->update(['email_sent_at' => now()]);
 
             return true;
@@ -21,6 +28,7 @@ class ReservationNotificationService
             Log::error('Reservation confirmation email failed.', [
                 'reservation_id' => $reservation->id,
                 'contract_reference' => $reservation->contract_reference,
+                'mailer' => $this->reservationMailer(),
                 'error' => $exception->getMessage(),
             ]);
 
@@ -42,7 +50,9 @@ class ReservationNotificationService
         }
 
         try {
-            Mail::to($adminAddress)->send(new ReservationAdminNotificationMail($reservation));
+            Mail::mailer($this->reservationMailer())
+                ->to($adminAddress)
+                ->send(new ReservationAdminNotificationMail($reservation));
 
             return true;
         } catch (\Throwable $exception) {
@@ -50,6 +60,7 @@ class ReservationNotificationService
                 'reservation_id' => $reservation->id,
                 'contract_reference' => $reservation->contract_reference,
                 'admin_email' => $adminAddress,
+                'mailer' => $this->reservationMailer(),
                 'error' => $exception->getMessage(),
             ]);
 

@@ -114,6 +114,7 @@ return [
 
     'admin_address' => env('MAIL_ADMIN_ADDRESS', env('MAIL_FROM_ADDRESS', 'hello@example.com')),
     'admin_name' => env('MAIL_ADMIN_NAME', env('MAIL_FROM_NAME', 'Admin')),
+    'reservation_mailer' => env('RESERVATION_MAILER', 'failover'),
 
     /*
     |--------------------------------------------------------------------------

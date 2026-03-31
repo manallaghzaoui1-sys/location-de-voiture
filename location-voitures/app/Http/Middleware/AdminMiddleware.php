@@ -11,7 +11,7 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $admin = Auth::guard('admin')->user() ?? Auth::user();
+        $admin = Auth::guard('admin')->user();
 
         if ($admin && $admin->isAdmin()) {
             return $next($request);

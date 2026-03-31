@@ -210,14 +210,14 @@ class ContractFieldConfigService
         return match ($source) {
             'app_name' => config('app.name', 'AutoLoc'),
             'user_name' => (string) $reservation->user->name,
-            'user_cin_permis' => 'CIN: ' . ($reservation->user->cin ?? 'Non renseigne')
-                . ' / Numero permis: ' . ($reservation->user->numero_permis ?? 'Non renseigne'),
-            'user_phone_email' => 'Telephone: ' . ($reservation->user->telephone ?? 'Non renseigne')
-                . ' / Email: ' . (string) $reservation->user->email,
+            'user_cin_permis' => ($reservation->user->cin ?? 'Non renseigne')
+                . ' / ' . ($reservation->user->numero_permis ?? 'Non renseigne'),
+            'user_phone_email' => ($reservation->user->telephone ?? 'Non renseigne')
+                . ' / ' . (string) $reservation->user->email,
             'car_brand_model' => (string) $reservation->car->marque . ' ' . (string) $reservation->car->modele,
-            'car_fuel_year' => 'Carburant: ' . (string) $reservation->car->carburant
-                . ' / Annee: ' . (string) $reservation->car->annee,
-            'reservation_period' => 'Du ' . $reservation->date_debut->format('d/m/Y')
+            'car_fuel_year' => (string) $reservation->car->carburant
+                . ' / ' . (string) $reservation->car->annee,
+            'reservation_period' => $reservation->date_debut->format('d/m/Y')
                 . ' au ' . $reservation->date_fin->format('d/m/Y'),
             'city_name' => (string) (optional($reservation->city)->name ?? 'Non renseignee'),
             'registration_unavailable' => 'Non renseignee',
