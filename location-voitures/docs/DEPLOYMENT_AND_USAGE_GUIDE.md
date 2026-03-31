@@ -33,3 +33,4 @@
 - Les fichiers `*.sql` sont ignores volontairement.
 - Pour reconstruire des donnees identiques sur une autre machine:
   - `php artisan migrate:fresh --seed`
+- Les vehicules peuvent aussi etre synchronises via `database/seed-data/cars.json` (mis a jour automatiquement apres create/update/delete depuis l'admin).

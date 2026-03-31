@@ -9,7 +9,7 @@
             id="cars-catalog-root"
             data-details-url="{{ url('/car') }}">
             <div class="row g-3">
-                @foreach($carsData as $car)
+                @forelse($carsData as $car)
                     <div class="col-sm-6 col-lg-4">
                         <article class="card h-100 border-0 shadow-sm">
                             <img src="{{ $car['image_url'] }}" class="card-img-top" alt="{{ $car['marque'] }} {{ $car['modele'] }}" style="height: 220px; object-fit: cover;">
@@ -21,7 +21,11 @@
                             </div>
                         </article>
                     </div>
-                @endforeach
+                @empty
+                    <div class="col-12">
+                        <div class="alert alert-warning mb-0">Aucun vehicule disponible pour le moment.</div>
+                    </div>
+                @endforelse
             </div>
         </div>
         <script id="cars-catalog-data" type="application/json">@json($carsData)</script>

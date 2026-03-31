@@ -1,0 +1,59 @@
+{
+    "updated_at": "2026-03-31T16:27:25+00:00",
+    "cars": [
+        {
+            "marque": "Renault",
+            "modele": "Clio",
+            "annee": 2022,
+            "carburant": "Essence",
+            "prix_par_jour": 250,
+            "description": "Voiture compacte id??ale pour la ville",
+            "disponible": true
+        },
+        {
+            "marque": "Peugeot",
+            "modele": "208",
+            "annee": 2023,
+            "carburant": "Diesel",
+            "prix_par_jour": 280,
+            "description": "Design moderne et confortable",
+            "disponible": true
+        },
+        {
+            "marque": "Dacia",
+            "modele": "Sandero",
+            "annee": 2022,
+            "carburant": "Essence",
+            "prix_par_jour": 200,
+            "description": "Rapport qualit??-prix exceptionnel",
+            "disponible": true
+        },
+        {
+            "marque": "Volkswagen",
+            "modele": "Golf",
+            "annee": 2023,
+            "carburant": "Essence",
+            "prix_par_jour": 350,
+            "description": "Berline compacte premium",
+            "disponible": true
+        },
+        {
+            "marque": "Toyota",
+            "modele": "Corolla",
+            "annee": 2023,
+            "carburant": "Hybride",
+            "prix_par_jour": 400,
+            "description": "Berline confortable et ??conomique",
+            "disponible": true
+        },
+        {
+            "marque": "BMW",
+            "modele": "Serie 3",
+            "annee": 2023,
+            "carburant": "Diesel",
+            "prix_par_jour": 600,
+            "description": "Luxe et performance",
+            "disponible": true
+        }
+    ]
+}

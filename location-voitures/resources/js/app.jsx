@@ -100,6 +100,12 @@ function mountCarsCatalog() {
         cars = [];
     }
 
+    // Keep server-rendered fallback visible if JSON parsing failed or returned no entries.
+    // This prevents a blank catalog on first load in unstable browser cache states.
+    if (cars.length === 0) {
+        return false;
+    }
+
     createRoot(root).render(<CarsCatalog cars={cars} detailsBaseUrl={detailsBaseUrl} />);
     carsCatalogMounted = true;
     return true;

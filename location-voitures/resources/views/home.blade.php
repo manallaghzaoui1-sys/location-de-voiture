@@ -6,7 +6,6 @@
 <div class="hero-section">
     <div class="container text-center">
         <img src="{{ asset('images/logo/bouhila-car-logo.svg') }}" alt="Bouhila Car" class="hero-logo-image mb-3" />
-        <h1 class="display-5 fw-bold">Bouhila Car</h1>
         <p class="lead mb-4">Location de voitures fiable, rapide et transparente partout au Maroc.</p>
         <a href="{{ route('cars.index') }}" class="btn btn-light btn-lg px-4">
             <i class="fas fa-search"></i> Voir nos vehicules

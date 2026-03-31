@@ -10,10 +10,12 @@ use App\Models\Car;
 use App\Models\City;
 use App\Models\Reservation;
 use App\Models\User;
+use App\Services\CarSnapshotService;
 use App\Services\ContractFieldConfigService;
 use App\Services\ContractPdfService;
 use App\Services\ImageStorageService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
@@ -22,6 +24,7 @@ class AdminController extends Controller
         private readonly ImageStorageService $imageStorageService,
         private readonly ContractPdfService $contractPdfService,
         private readonly ContractFieldConfigService $contractFieldConfigService,
+        private readonly CarSnapshotService $carSnapshotService,
     ) {
         $this->middleware('auth:admin');
     }
@@ -98,9 +101,10 @@ class AdminController extends Controller
         }
 
         Car::create($data);
+        $this->syncCarsSnapshotSafely();
 
         return redirect()->route('admin.cars.index')
-            ->with('success', 'Voiture ajoutÃ©e avec succÃ¨s.');
+            ->with('success', 'Voiture ajoutee avec succes.');
     }
 
     public function edit($id)
@@ -123,9 +127,10 @@ class AdminController extends Controller
         }
 
         $car->update($data);
+        $this->syncCarsSnapshotSafely();
 
         return redirect()->route('admin.cars.index')
-            ->with('success', 'Voiture modifiÃ©e avec succÃ¨s.');
+            ->with('success', 'Voiture modifiee avec succes.');
     }
 
     public function destroy($id)
@@ -133,9 +138,10 @@ class AdminController extends Controller
         $car = Car::findOrFail($id);
         $this->imageStorageService->deletePublicFile($car->image);
         $car->delete();
+        $this->syncCarsSnapshotSafely();
 
         return redirect()->route('admin.cars.index')
-            ->with('success', 'Voiture supprimÃ©e avec succÃ¨s.');
+            ->with('success', 'Voiture supprimee avec succes.');
     }
 
     public function reservations(Request $request)
@@ -206,7 +212,7 @@ class AdminController extends Controller
 
         City::create($payload);
 
-        return back()->with('success', 'Ville ajoutÃ©e avec succÃ¨s.');
+        return back()->with('success', 'Ville ajoutee avec succes.');
     }
 
     public function citiesUpdate(UpdateCityRequest $request, City $city)
@@ -216,18 +222,18 @@ class AdminController extends Controller
 
         $city->update($payload);
 
-        return back()->with('success', 'Ville mise Ã  jour avec succÃ¨s.');
+        return back()->with('success', 'Ville mise a jour avec succes.');
     }
 
     public function citiesDestroy(City $city)
     {
         if ($city->reservations()->exists()) {
-            return back()->with('error', 'Impossible de supprimer une ville dÃ©jÃ  utilisÃ©e dans une rÃ©servation.');
+            return back()->with('error', 'Impossible de supprimer une ville deja utilisee dans une reservation.');
         }
 
         $city->delete();
 
-        return back()->with('success', 'Ville supprimÃ©e avec succÃ¨s.');
+        return back()->with('success', 'Ville supprimee avec succes.');
     }
 
     public function downloadContract(Reservation $reservation)
@@ -290,5 +296,15 @@ class AdminController extends Controller
 
         return response()->download(Storage::disk('local')->path($path));
     }
-}
 
+    private function syncCarsSnapshotSafely(): void
+    {
+        try {
+            $this->carSnapshotService->syncFromDatabase();
+        } catch (\Throwable $exception) {
+            Log::warning('Cars snapshot sync failed after admin catalog update.', [
+                'error' => $exception->getMessage(),
+            ]);
+        }
+    }
+}
