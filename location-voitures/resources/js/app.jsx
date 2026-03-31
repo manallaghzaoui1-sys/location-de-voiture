@@ -108,6 +108,11 @@ function mountCarsCatalog() {
 
     createRoot(root).render(<CarsCatalog cars={cars} detailsBaseUrl={detailsBaseUrl} />);
     carsCatalogMounted = true;
+
+    // React mount can complete after this tick; re-run motion init to avoid hidden blocks on first paint.
+    requestAnimationFrame(initProfessionalMotion);
+    window.setTimeout(initProfessionalMotion, 180);
+
     return true;
 }
 
@@ -146,6 +151,9 @@ function mountWidgets() {
     if (didMountCarsCatalog || didMountReservationPricing) {
         requestAnimationFrame(initProfessionalMotion);
     }
+
+    // Safe fallback: always retry once to catch late-rendered nodes.
+    window.setTimeout(initProfessionalMotion, 220);
 }
 
 if (document.readyState === 'loading') {

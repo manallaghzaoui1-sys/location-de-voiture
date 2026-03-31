@@ -61,7 +61,7 @@ function CarsCatalog({ cars }) {
 
     return (
         <div className="catalog-shell">
-            <div className="reservation-steps mb-4" data-animate="reveal">
+            <div className="reservation-steps mb-4">
                 <div className="reservation-step">
                     <span>1</span>
                     <div>
@@ -86,7 +86,7 @@ function CarsCatalog({ cars }) {
             </div>
 
             <div className="catalog-layout">
-                <aside className="catalog-sidebar" data-animate="reveal">
+                <aside className="catalog-sidebar">
                     <div className="sidebar-head">
                         <h3>Filtrer</h3>
                         <button type="button" onClick={clearAllFilters}>Effacer</button>
@@ -132,7 +132,7 @@ function CarsCatalog({ cars }) {
                 </aside>
 
                 <section className="catalog-content">
-                    <div className="catalog-head mb-3" data-animate="reveal">
+                    <div className="catalog-head mb-3">
                         <h2>Selectionnez votre vehicule</h2>
                         <div className="catalog-actions">
                             <label htmlFor="catalog-sort">Sort by</label>
@@ -154,12 +154,10 @@ function CarsCatalog({ cars }) {
                     )}
 
                     <div className="cars-grid">
-                        {filteredCars.map((car, index) => (
+                        {filteredCars.map((car) => (
                             <article
                                 className="car-card car-card-pro"
                                 key={car.token}
-                                data-animate="reveal"
-                                style={{ '--motion-delay': `${(index % 6) * 70}ms` }}
                             >
                                 <div className="car-media">
                                     <img src={car.image_url} alt={`${car.marque} ${car.modele}`} loading="lazy" />
