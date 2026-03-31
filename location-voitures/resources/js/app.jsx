@@ -16,7 +16,7 @@ function initProfessionalMotion() {
     body.classList.add('motion-enabled');
 
     const targets = document.querySelectorAll(
-        '.hero-section, .feature-card, .panel-card, .auth-card, .car-card, .admin-panel, .admin-stat-card, .alert'
+        '[data-animate="reveal"], .hero-section, .feature-card, .panel-card, .auth-card, .car-card, .admin-panel, .admin-stat-card, .alert'
     );
 
     let delayStep = 0;
@@ -30,6 +30,18 @@ function initProfessionalMotion() {
             delayStep = (delayStep + 1) % 6;
         }
     });
+
+    const revealImmediately = () => {
+        targets.forEach((element) => {
+            element.style.setProperty('--motion-delay', '0ms');
+            element.classList.add('is-visible');
+        });
+    };
+
+    if (!('IntersectionObserver' in window)) {
+        revealImmediately();
+        return;
+    }
 
     const observer = new IntersectionObserver(
         (entries) => {
@@ -46,14 +58,38 @@ function initProfessionalMotion() {
     );
 
     targets.forEach((element) => observer.observe(element));
+
+    window.setTimeout(() => {
+        const hiddenTargets = Array.from(targets).filter((element) => !element.classList.contains('is-visible'));
+        if (hiddenTargets.length > 0) {
+            revealImmediately();
+        }
+    }, 1200);
 }
 
 const carsCatalogRoot = document.getElementById('cars-catalog-root');
 if (carsCatalogRoot) {
-    const cars = JSON.parse(carsCatalogRoot.dataset.cars || '[]');
     const detailsBaseUrl = carsCatalogRoot.dataset.detailsUrl || '/car';
+    const carsDataScript = document.getElementById('cars-catalog-data');
+    let cars = [];
+
+    try {
+        if (carsDataScript?.textContent) {
+            cars = JSON.parse(carsDataScript.textContent);
+        } else if (carsCatalogRoot.dataset.cars) {
+            cars = JSON.parse(carsCatalogRoot.dataset.cars);
+        }
+
+        if (!Array.isArray(cars)) {
+            cars = [];
+        }
+    } catch (error) {
+        console.error('Cars catalog data parsing failed:', error);
+        cars = [];
+    }
 
     createRoot(carsCatalogRoot).render(<CarsCatalog cars={cars} detailsBaseUrl={detailsBaseUrl} />);
+    requestAnimationFrame(initProfessionalMotion);
 }
 
 const reservationPricingRoot = document.getElementById('reservation-pricing-root');
@@ -71,6 +107,7 @@ if (reservationPricingRoot) {
             citySelectId={citySelectId}
         />
     );
+    requestAnimationFrame(initProfessionalMotion);
 }
 
 if (document.readyState === 'loading') {

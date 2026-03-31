@@ -1,0 +1,27 @@
+<svg width="1200" height="360" viewBox="0 0 1200 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="goldMain" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F7E2A4"/>
+      <stop offset="45%" stop-color="#D7AB4A"/>
+      <stop offset="100%" stop-color="#A8751D"/>
+    </linearGradient>
+    <linearGradient id="goldSoft" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#F9EDC2"/>
+      <stop offset="100%" stop-color="#C38D2C"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="360" fill="transparent"/>
+
+  <g transform="translate(40 30)">
+    <path d="M40 20H145C205 20 235 44 235 82C235 108 220 126 186 138C227 149 252 173 252 208C252 253 214 285 147 285H40V20ZM98 69V121H140C164 121 178 111 178 95C178 79 165 69 141 69H98ZM98 168V237H146C173 237 189 224 189 205C189 185 173 168 145 168H98Z" fill="url(#goldMain)"/>
+    <path d="M384 102C505 58 609 42 714 42C843 42 926 64 995 114" stroke="url(#goldSoft)" stroke-width="12" stroke-linecap="round"/>
+    <path d="M378 116H1005C1078 116 1133 132 1160 155" stroke="url(#goldMain)" stroke-width="11" stroke-linecap="round"/>
+    <path d="M431 169C466 130 531 129 566 169" stroke="url(#goldMain)" stroke-width="10" stroke-linecap="round"/>
+    <path d="M914 169C948 128 1015 128 1048 169" stroke="url(#goldMain)" stroke-width="10" stroke-linecap="round"/>
+    <path d="M694 154C757 163 810 163 876 154" stroke="url(#goldMain)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M542 84L615 84L634 114L560 114Z" fill="url(#goldMain)"/>
+
+    <text x="385" y="295" fill="url(#goldMain)" font-size="92" font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="2">BOUHILA CAR</text>
+  </g>
+</svg>

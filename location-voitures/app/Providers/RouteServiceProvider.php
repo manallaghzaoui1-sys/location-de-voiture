@@ -36,6 +36,12 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(12)->by('reservation|' . $userKey);
         });
 
+        RateLimiter::for('contract-download', function (Request $request) {
+            $userKey = $request->user()?->id ?: $request->ip();
+
+            return Limit::perMinute(20)->by('contract-download|' . $userKey);
+        });
+
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api')

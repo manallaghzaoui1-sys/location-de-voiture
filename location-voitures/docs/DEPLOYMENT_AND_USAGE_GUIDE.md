@@ -1,29 +1,35 @@
-# AutoLoc - Guide rapide (images, réservation, admin)
+﻿# AutoLoc - Guide rapide (images, reservation, admin)
 
-## 1) Stratégie images (professionnelle et stable)
+## 1) Strategie images (professionnelle et stable)
 - Upload voitures dans `public/images/images_voiture`
-- Nom de fichier sauvegardé en base (ex: `car_65f3...jpg`)
+- Nom de fichier sauvegarde en base (ex: `car_65f3...jpg`)
 - Affichage public via `asset('images/images_voiture/...')`
-- Compatibilité legacy: anciennes images `storage/app/public` restent affichables
-- Si image absente/fichier supprimé: placeholder local `public/images/placeholders/car-default.svg`
+- Compatibilite legacy: anciennes images `storage/app/public` restent affichables
+- Si image absente/fichier supprime: placeholder local `public/images/placeholders/car-default.svg`
 
 ## 2) Documents sensibles (CIN/permis)
-- Stockage privé: `storage/app/private/identity/...`
-- Jamais exposés en URL publique
-- Téléchargement possible uniquement via route admin protégée
+- Stockage prive: `storage/app/private/identity/...`
+- Jamais exposes en URL publique
+- Telechargement possible uniquement via route admin protegee
 
-## 3) Flux réservation
+## 3) Flux reservation
 1. Client choisit voiture + dates + ville active
 2. Calcul: `prix_location + frais_deplacement`
-3. Vérification disponibilité (dates chevauchantes)
-4. Enregistrement réservation avec référence contrat
-5. Génération contrat PDF
-6. Envoi email SMTP (si échec, réservation conservée + log)
-7. Téléchargement PDF depuis confirmation / mes réservations
+3. Verification disponibilite (dates chevauchantes)
+4. Enregistrement reservation avec reference contrat
+5. Generation contrat PDF
+6. Envoi email SMTP (si echec, reservation conservee + log)
+7. Telechargement PDF depuis confirmation / mes reservations
 
-## 4) Changement de machine / déploiement
+## 4) Changement de machine / deploiement
 1. Restaurer la base MySQL
 2. Copier les fichiers de `public/images/images_voiture` et `storage/app/private` (backup)
-3. Exécuter:
+3. Executer:
    - `php artisan migrate --seed`
    - `php artisan optimize:clear`
+
+## 5) GitHub et base de donnees
+- Push GitHub = code uniquement (pas les donnees MySQL en cours).
+- Les fichiers `*.sql` sont ignores volontairement.
+- Pour reconstruire des donnees identiques sur une autre machine:
+  - `php artisan migrate:fresh --seed`

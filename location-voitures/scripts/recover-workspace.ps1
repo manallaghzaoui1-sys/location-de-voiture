@@ -10,7 +10,7 @@ if (-not (Test-Path ".env")) {
 }
 
 php artisan optimize:clear
-php artisan migrate --force
+php artisan migrate --seed --force
 php artisan storage:link
 
 Write-Host "Workspace recovery completed." -ForegroundColor Green

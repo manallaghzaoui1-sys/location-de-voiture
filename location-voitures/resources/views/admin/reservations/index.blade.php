@@ -89,12 +89,12 @@
                             </form>
                         </td>
                         <td>
-                            <a href="{{ route('admin.reservation.contract.download', $reservation) }}" class="btn btn-sm btn-outline-primary mb-1">PDF</a>
+                            <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('admin.reservation.contract.download', now()->addMinutes(20), ['reservation' => $reservation->id]) }}" class="btn btn-sm btn-outline-primary mb-1">PDF</a>
                             @if($reservation->user->cin_document_path)
-                                <a href="{{ route('admin.users.documents.download', [$reservation->user, 'cin']) }}" class="btn btn-sm btn-outline-secondary mb-1">Doc CIN</a>
+                                <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('admin.users.documents.download', now()->addMinutes(20), ['user' => $reservation->user->id, 'type' => 'cin']) }}" class="btn btn-sm btn-outline-secondary mb-1">Doc CIN</a>
                             @endif
                             @if($reservation->user->permis_document_path)
-                                <a href="{{ route('admin.users.documents.download', [$reservation->user, 'permis']) }}" class="btn btn-sm btn-outline-secondary mb-1">Doc Permis</a>
+                                <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('admin.users.documents.download', now()->addMinutes(20), ['user' => $reservation->user->id, 'type' => 'permis']) }}" class="btn btn-sm btn-outline-secondary mb-1">Doc Permis</a>
                             @endif
                         </td>
                     </tr>

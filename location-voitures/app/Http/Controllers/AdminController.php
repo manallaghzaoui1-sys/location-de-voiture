@@ -10,6 +10,7 @@ use App\Models\Car;
 use App\Models\City;
 use App\Models\Reservation;
 use App\Models\User;
+use App\Services\ContractFieldConfigService;
 use App\Services\ContractPdfService;
 use App\Services\ImageStorageService;
 use Illuminate\Http\Request;
@@ -20,6 +21,7 @@ class AdminController extends Controller
     public function __construct(
         private readonly ImageStorageService $imageStorageService,
         private readonly ContractPdfService $contractPdfService,
+        private readonly ContractFieldConfigService $contractFieldConfigService,
     ) {
         $this->middleware('auth:admin');
     }
@@ -98,7 +100,7 @@ class AdminController extends Controller
         Car::create($data);
 
         return redirect()->route('admin.cars.index')
-            ->with('success', 'Voiture ajoutée avec succès.');
+            ->with('success', 'Voiture ajoutÃ©e avec succÃ¨s.');
     }
 
     public function edit($id)
@@ -123,7 +125,7 @@ class AdminController extends Controller
         $car->update($data);
 
         return redirect()->route('admin.cars.index')
-            ->with('success', 'Voiture modifiée avec succès.');
+            ->with('success', 'Voiture modifiÃ©e avec succÃ¨s.');
     }
 
     public function destroy($id)
@@ -133,7 +135,7 @@ class AdminController extends Controller
         $car->delete();
 
         return redirect()->route('admin.cars.index')
-            ->with('success', 'Voiture supprimée avec succès.');
+            ->with('success', 'Voiture supprimÃ©e avec succÃ¨s.');
     }
 
     public function reservations(Request $request)
@@ -178,9 +180,16 @@ class AdminController extends Controller
 
         $reservation = Reservation::findOrFail($id);
         $this->authorize('updateStatus', $reservation);
+        $previousStatus = $reservation->statut;
         $reservation->update($validated);
 
-        return back()->with('success', 'Statut mis à jour avec succès.');
+        if ($validated['statut'] === 'confirme' && $previousStatus !== 'confirme') {
+            $reservation->loadMissing(['user', 'car', 'city']);
+            $pdfPath = $this->contractPdfService->generateAndStore($reservation);
+            $reservation->update(['contract_pdf_path' => $pdfPath]);
+        }
+
+        return back()->with('success', 'Statut mis a jour avec succes.');
     }
 
     public function citiesIndex()
@@ -197,7 +206,7 @@ class AdminController extends Controller
 
         City::create($payload);
 
-        return back()->with('success', 'Ville ajoutée avec succès.');
+        return back()->with('success', 'Ville ajoutÃ©e avec succÃ¨s.');
     }
 
     public function citiesUpdate(UpdateCityRequest $request, City $city)
@@ -207,23 +216,69 @@ class AdminController extends Controller
 
         $city->update($payload);
 
-        return back()->with('success', 'Ville mise à jour avec succès.');
+        return back()->with('success', 'Ville mise Ã  jour avec succÃ¨s.');
     }
 
     public function citiesDestroy(City $city)
     {
         if ($city->reservations()->exists()) {
-            return back()->with('error', 'Impossible de supprimer une ville déjà utilisée dans une réservation.');
+            return back()->with('error', 'Impossible de supprimer une ville dÃ©jÃ  utilisÃ©e dans une rÃ©servation.');
         }
 
         $city->delete();
 
-        return back()->with('success', 'Ville supprimée avec succès.');
+        return back()->with('success', 'Ville supprimÃ©e avec succÃ¨s.');
     }
 
     public function downloadContract(Reservation $reservation)
     {
         return $this->contractPdfService->downloadResponse($reservation);
+    }
+
+    public function contractFields()
+    {
+        $fields = $this->contractFieldConfigService->getFields();
+        $sources = $this->contractFieldConfigService->availableSources();
+        $sections = $this->contractFieldConfigService->availableSections();
+
+        return view('admin.contracts.fields', compact('fields', 'sources', 'sections'));
+    }
+
+    public function updateContractFields(Request $request)
+    {
+        $validated = $request->validate([
+            'fields' => ['required', 'array', 'min:1'],
+            'fields.*.id' => ['nullable', 'string', 'max:100'],
+            'fields.*.label' => ['required', 'string', 'max:120'],
+            'fields.*.source' => ['required', 'string', 'max:50'],
+            'fields.*.section' => ['required', 'in:parties,vehicle,financial'],
+            'fields.*.value' => ['nullable', 'string', 'max:300'],
+            'fields.*.enabled' => ['nullable'],
+        ]);
+
+        $rawFields = [];
+
+        foreach ($validated['fields'] as $field) {
+            $rawFields[] = [
+                'id' => $field['id'] ?? null,
+                'label' => $field['label'],
+                'source' => $field['source'],
+                'section' => $field['section'],
+                'value' => $field['value'] ?? null,
+                'enabled' => array_key_exists('enabled', $field),
+            ];
+        }
+
+        $this->contractFieldConfigService->saveFields($rawFields);
+
+        return back()->with('success', 'Configuration des champs du contrat mise a jour.');
+    }
+
+    public function resetContractFields()
+    {
+        $this->contractFieldConfigService->resetToDefaults();
+
+        return back()->with('success', 'Champs du contrat reinitialises aux valeurs par defaut.');
     }
 
     public function downloadClientDocument(User $user, string $type)
@@ -236,3 +291,4 @@ class AdminController extends Controller
         return response()->download(Storage::disk('local')->path($path));
     }
 }
+

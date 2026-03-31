@@ -1,4 +1,4 @@
-@extends('layouts.client')
+﻿@extends('layouts.client')
 
 @section('title', $car->marque . ' ' . $car->modele)
 
@@ -14,28 +14,28 @@
         <div class="col-lg-6">
             <div class="panel-card p-4 h-100">
                 <h1 class="h2 mb-2">{{ $car->marque }} {{ $car->modele }}</h1>
-                <p class="text-muted mb-4">{{ $car->description ?? 'Description non disponible pour ce v?hicule.' }}</p>
+                <p class="text-muted mb-4">{{ $car->description ?? 'Description non disponible pour ce vehicule.' }}</p>
 
                 <div class="info-grid mb-4">
-                    <div class="info-row"><span><i class="fas fa-calendar-alt"></i> Année</span><strong>{{ $car->annee }}</strong></div>
+                    <div class="info-row"><span><i class="fas fa-calendar-alt"></i> Annee</span><strong>{{ $car->annee }}</strong></div>
                     <div class="info-row"><span><i class="fas fa-gas-pump"></i> Carburant</span><strong>{{ $car->carburant }}</strong></div>
                     <div class="info-row"><span><i class="fas fa-money-bill-wave"></i> Prix / jour</span><strong>{{ number_format($car->prix_par_jour, 2) }} DH</strong></div>
                 </div>
 
                 @auth('web')
                     @if($car->disponible)
-                        <a href="{{ route('reservation.create', $car->id) }}" class="btn btn-primary btn-lg w-100">
-                            <i class="fas fa-calendar-check"></i> Réserver maintenant
+                        <a href="{{ route('reservation.create', $carToken) }}" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-calendar-check"></i> Reserver maintenant
                         </a>
                     @else
-                        <div class="alert alert-warning mb-0 text-center">Ce véhicule n'est pas disponible actuellement.</div>
+                        <div class="alert alert-warning mb-0 text-center">Ce vehicule n'est pas disponible actuellement.</div>
                     @endif
                 @else
                     <div class="border rounded p-3 bg-light">
-                        <h5 class="mb-3">Créer un compte pour réserver ce véhicule</h5>
+                        <h5 class="mb-3">Creer un compte pour reserver ce vehicule</h5>
                         <form method="POST" action="{{ route('register.post') }}" class="row g-2">
                             @csrf
-                            <input type="hidden" name="redirect_to" value="{{ route('reservation.create', $car->id, false) }}">
+                            <input type="hidden" name="redirect_to" value="{{ route('reservation.create', $carToken, false) }}">
 
                             <div class="col-12">
                                 <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" placeholder="Nom complet" value="{{ old('name') }}" required>
@@ -46,7 +46,7 @@
                             </div>
 
                             <div class="col-md-6">
-                                <input type="text" name="telephone" class="form-control @error('telephone') is-invalid @enderror" placeholder="Téléphone" value="{{ old('telephone') }}">
+                                <input type="text" name="telephone" class="form-control @error('telephone') is-invalid @enderror" placeholder="Telephone" value="{{ old('telephone') }}">
                             </div>
 
                             <div class="col-md-6">
@@ -54,7 +54,7 @@
                             </div>
 
                             <div class="col-12">
-                                <input type="text" name="numero_permis" class="form-control @error('numero_permis') is-invalid @enderror" placeholder="Numéro de permis" value="{{ old('numero_permis') }}" required>
+                                <input type="text" name="numero_permis" class="form-control @error('numero_permis') is-invalid @enderror" placeholder="Numero de permis" value="{{ old('numero_permis') }}" required>
                             </div>
 
                             <div class="col-md-6">
@@ -66,12 +66,12 @@
                             </div>
 
                             <div class="col-12">
-                                <button class="btn btn-primary w-100" type="submit">Créer le compte et continuer</button>
+                                <button class="btn btn-primary w-100" type="submit">Creer le compte et continuer</button>
                             </div>
                         </form>
 
                         <div class="text-center mt-2">
-                            <small>Déjà inscrit <a href="{{ route('login') }}">Connectez-vous</a></small>
+                            <small>Deja inscrit ? <a href="{{ route('login') }}">Connectez-vous</a></small>
                         </div>
                     </div>
                 @endauth

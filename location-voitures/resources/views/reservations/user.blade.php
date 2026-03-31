@@ -44,7 +44,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="{{ route('reservations.contract.download', $reservation) }}" class="btn btn-sm btn-outline-primary">
+                                    <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('reservations.contract.download', now()->addMinutes(20), ['reservation' => $reservation->id]) }}" class="btn btn-sm btn-outline-primary">
                                         <i class="fas fa-file-pdf"></i> PDF
                                     </a>
                                 </td>

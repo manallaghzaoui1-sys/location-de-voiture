@@ -8,11 +8,17 @@ use Illuminate\Support\Facades\Storage;
 
 class ContractPdfService
 {
+    public function __construct(
+        private readonly ContractFieldConfigService $fieldConfigService,
+    ) {
+    }
+
     public function generateAndStore(Reservation $reservation): string
     {
         $pdf = Pdf::loadView('pdf.contract', [
             'reservation' => $reservation,
             'generatedAt' => now(),
+            'contractLinesBySection' => $this->fieldConfigService->buildLinesBySection($reservation),
         ]);
 
         $relativePath = 'private/contracts/' . $reservation->contract_reference . '.pdf';
@@ -35,4 +41,3 @@ class ContractPdfService
         );
     }
 }
-

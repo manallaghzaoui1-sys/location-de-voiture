@@ -1,20 +1,21 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoLoc Admin - @yield('title', 'Back-office')</title>
+    <title>Bouhila Car Admin - @yield('title', 'Back-office')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.jsx'])
 </head>
 <body class="admin-body">
+@php($brandLogo = asset('images/logo/bouhila-car-logo.svg'))
 <div class="admin-shell">
     <aside class="admin-sidebar">
         <div class="admin-brand">
-            <i class="fas fa-shield-halved"></i>
+            <img src="{{ $brandLogo }}" alt="Bouhila Car" class="admin-brand-logo-image" />
             <div>
-                <strong>AutoLoc Admin</strong>
+                <strong>Bouhila Car Admin</strong>
                 <small>Back-office</small>
             </div>
         </div>
@@ -24,10 +25,13 @@
                 <i class="fas fa-gauge"></i> Dashboard
             </a>
             <a href="{{ route('admin.cars.index') }}" class="{{ request()->routeIs('admin.cars.*') ? 'active' : '' }}">
-                <i class="fas fa-car-side"></i> Véhicules
+                <i class="fas fa-car-side"></i> Vehicules
             </a>
             <a href="{{ route('admin.reservations') }}" class="{{ request()->routeIs('admin.reservations') || request()->routeIs('admin.reservation.*') ? 'active' : '' }}">
-                <i class="fas fa-calendar-check"></i> Réservations
+                <i class="fas fa-calendar-check"></i> Reservations
+            </a>
+            <a href="{{ route('admin.contract-fields.index') }}" class="{{ request()->routeIs('admin.contract-fields.*') ? 'active' : '' }}">
+                <i class="fas fa-file-contract"></i> Champs contrat
             </a>
             <a href="{{ route('admin.cities.index') }}" class="{{ request()->routeIs('admin.cities.*') ? 'active' : '' }}">
                 <i class="fas fa-city"></i> Villes
@@ -43,7 +47,7 @@
         <header class="admin-topbar">
             <h1>@yield('title', 'Back-office')</h1>
             <form method="POST" action="{{ route('admin.logout') }}">@csrf
-                <button class="btn btn-sm btn-outline-danger">Déconnexion admin</button>
+                <button class="btn btn-sm btn-outline-danger">Deconnexion admin</button>
             </form>
         </header>
 

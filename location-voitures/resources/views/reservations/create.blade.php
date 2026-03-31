@@ -12,7 +12,7 @@
 
                 <form method="POST" action="{{ route('reservation.store') }}">
                     @csrf
-                    <input type="hidden" name="car_id" value="{{ $car->id }}">
+                    <input type="hidden" name="car_token" value="{{ $carToken }}">
 
                     <div class="mb-3">
                         <label class="form-label">Voiture</label>

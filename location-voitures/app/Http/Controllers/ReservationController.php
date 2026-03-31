@@ -9,6 +9,7 @@ use App\Models\Reservation;
 use App\Services\ContractPdfService;
 use App\Services\ReservationNotificationService;
 use App\Services\ReservationPricingService;
+use App\Services\UrlObfuscationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -18,20 +19,27 @@ class ReservationController extends Controller
         private readonly ReservationPricingService $pricingService,
         private readonly ContractPdfService $contractPdfService,
         private readonly ReservationNotificationService $notificationService,
+        private readonly UrlObfuscationService $urlObfuscationService,
     ) {
     }
 
-    public function create($carId)
+    public function create(string $carToken)
     {
+        $carId = $this->urlObfuscationService->decodeCarToken($carToken);
+        abort_if($carId === null, 404);
+
         $car = Car::findOrFail($carId);
         $cities = City::where('is_active', true)->orderBy('name')->get();
 
-        return view('reservations.create', compact('car', 'cities'));
+        return view('reservations.create', compact('car', 'cities', 'carToken'));
     }
 
     public function store(StoreReservationRequest $request)
     {
-        $car = Car::findOrFail($request->input('car_id'));
+        $carId = $this->urlObfuscationService->decodeCarToken((string) $request->input('car_token'));
+        abort_if($carId === null, 404);
+
+        $car = Car::findOrFail($carId);
         $city = City::findOrFail($request->input('city_id'));
 
         if (! $car->isDisponible($request->date_debut, $request->date_fin)) {

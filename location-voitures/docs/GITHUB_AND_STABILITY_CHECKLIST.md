@@ -6,6 +6,8 @@
   - `*.sql`
   - `server.log`
   - `server-error.log`
+- Important: GitHub does not store your running MySQL data automatically.
+  Data must be recreated from migrations + seeders after clone.
 - Before every push run:
   - `powershell -ExecutionPolicy Bypass -File scripts/pre-push-safety.ps1`
 
@@ -20,6 +22,14 @@
   - `powershell -ExecutionPolicy Bypass -File scripts/recover-workspace.ps1`
 - Then start app:
   - `php artisan serve`
+
+## 5) Share same demo data with every clone
+- Use:
+  - `php artisan migrate:fresh --seed`
+- Demo accounts created by seeders:
+  - `admin@example.com` / `admin123`
+  - `client1@example.com` / `client123`
+  - `client2@example.com` / `client123`
 
 ## 4) Daily safe workflow
 1. `git pull`

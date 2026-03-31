@@ -15,7 +15,7 @@ class StoreReservationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'car_id' => ['required', 'exists:cars,id'],
+            'car_token' => ['required', 'string', 'max:100'],
             'city_id' => [
                 'required',
                 Rule::exists('cities', 'id')->where(fn ($query) => $query->where('is_active', true)),
