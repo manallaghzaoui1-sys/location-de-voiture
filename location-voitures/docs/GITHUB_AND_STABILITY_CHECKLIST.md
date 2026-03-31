@@ -33,7 +33,16 @@
 
 ## 4) Daily safe workflow
 1. `git pull`
-2. `powershell -ExecutionPolicy Bypass -File scripts/recover-workspace.ps1`
+2. `powershell -ExecutionPolicy Bypass -File scripts/deploy-sync.ps1`
 3. work normally
 4. `powershell -ExecutionPolicy Bypass -File scripts/pre-push-safety.ps1`
 5. `git push`
+
+## 6) CI on GitHub
+- Workflow file: `.github/workflows/ci.yml`
+- On every push/PR to `main`, CI does:
+  - composer install
+  - npm ci
+  - migrate + seed (SQLite)
+  - php artisan test
+  - npm run build

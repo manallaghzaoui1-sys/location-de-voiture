@@ -34,3 +34,4 @@
 - Pour reconstruire des donnees identiques sur une autre machine:
   - `php artisan migrate:fresh --seed`
 - Les vehicules peuvent aussi etre synchronises via `database/seed-data/cars.json` (mis a jour automatiquement apres create/update/delete depuis l'admin).
+- Les images associees aux vehicules sont synchronisees dans `database/seed-data/car-images/` puis restaurees automatiquement vers `public/images/images_voiture`.

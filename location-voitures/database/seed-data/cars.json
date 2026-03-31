@@ -1,5 +1,5 @@
 {
-    "updated_at": "2026-03-31T16:38:26+00:00",
+    "updated_at": "2026-03-31T16:55:19+00:00",
     "cars": [
         {
             "marque": "Renault",
@@ -7,6 +7,7 @@
             "annee": 2022,
             "carburant": "Essence",
             "prix_par_jour": 250,
+            "image": "car_69c7a8367e1641.28903998.jpeg",
             "description": "Voiture compacte id??ale pour la ville",
             "disponible": true
         },
@@ -16,6 +17,7 @@
             "annee": 2023,
             "carburant": "Diesel",
             "prix_par_jour": 280,
+            "image": "car_69c7aa96d93300.42576486.jpeg",
             "description": "Design moderne et confortable",
             "disponible": true
         },
@@ -25,6 +27,7 @@
             "annee": 2022,
             "carburant": "Essence",
             "prix_par_jour": 200,
+            "image": "car_69c7aac198be80.44917528.jpeg",
             "description": "Rapport qualit??-prix exceptionnel",
             "disponible": true
         },
@@ -34,6 +37,7 @@
             "annee": 2023,
             "carburant": "Essence",
             "prix_par_jour": 350,
+            "image": "car_69c7aadfc264e3.41269720.jpeg",
             "description": "Berline compacte premium",
             "disponible": true
         },
@@ -43,6 +47,7 @@
             "annee": 2023,
             "carburant": "Hybride",
             "prix_par_jour": 400,
+            "image": "car_69c7ab1386eff0.05224627.jpeg",
             "description": "Berline confortable et ??conomique",
             "disponible": true
         },
@@ -52,6 +57,7 @@
             "annee": 2023,
             "carburant": "Diesel",
             "prix_par_jour": 600,
+            "image": "car_69c7ab3343d1a0.71461096.jpeg",
             "description": "Luxe et performance",
             "disponible": true
         }

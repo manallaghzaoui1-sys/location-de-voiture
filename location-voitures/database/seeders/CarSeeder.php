@@ -17,6 +17,8 @@ class CarSeeder extends Seeder
         }
 
         foreach ($cars as $car) {
+            $this->restoreSnapshotImage($car['image'] ?? null);
+
             Car::updateOrCreate(
                 ['marque' => $car['marque'], 'modele' => $car['modele'], 'annee' => $car['annee']],
                 $car
@@ -57,6 +59,7 @@ class CarSeeder extends Seeder
                 'annee' => 2022,
                 'carburant' => 'Essence',
                 'prix_par_jour' => 250,
+                'image' => null,
                 'description' => 'Voiture compacte ideale pour la ville, economique et facile a garer.',
                 'disponible' => true,
             ],
@@ -66,6 +69,7 @@ class CarSeeder extends Seeder
                 'annee' => 2023,
                 'carburant' => 'Diesel',
                 'prix_par_jour' => 280,
+                'image' => null,
                 'description' => 'Design moderne et confortable, parfaite pour les longs trajets.',
                 'disponible' => true,
             ],
@@ -75,6 +79,7 @@ class CarSeeder extends Seeder
                 'annee' => 2022,
                 'carburant' => 'Essence',
                 'prix_par_jour' => 200,
+                'image' => null,
                 'description' => 'Rapport qualite-prix exceptionnel, spacieuse et fiable.',
                 'disponible' => true,
             ],
@@ -84,6 +89,7 @@ class CarSeeder extends Seeder
                 'annee' => 2023,
                 'carburant' => 'Essence',
                 'prix_par_jour' => 350,
+                'image' => null,
                 'description' => 'Berline compacte premium, alliant confort et performance.',
                 'disponible' => true,
             ],
@@ -93,6 +99,7 @@ class CarSeeder extends Seeder
                 'annee' => 2023,
                 'carburant' => 'Hybride',
                 'prix_par_jour' => 400,
+                'image' => null,
                 'description' => 'Berline confortable et economique, technologie hybride.',
                 'disponible' => true,
             ],
@@ -102,9 +109,32 @@ class CarSeeder extends Seeder
                 'annee' => 2023,
                 'carburant' => 'Diesel',
                 'prix_par_jour' => 600,
+                'image' => null,
                 'description' => 'Luxe et performance, une experience de conduite exceptionnelle.',
                 'disponible' => true,
             ],
         ];
+    }
+
+    private function restoreSnapshotImage(?string $filename): void
+    {
+        if (! is_string($filename) || trim($filename) === '') {
+            return;
+        }
+
+        $source = base_path('database/seed-data/car-images/' . $filename);
+        if (! File::exists($source)) {
+            return;
+        }
+
+        $targetDir = public_path('images/images_voiture');
+        if (! File::exists($targetDir)) {
+            File::makeDirectory($targetDir, 0755, true);
+        }
+
+        $target = $targetDir . DIRECTORY_SEPARATOR . $filename;
+        if (! File::exists($target)) {
+            File::copy($source, $target);
+        }
     }
 }

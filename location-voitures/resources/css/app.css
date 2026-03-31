@@ -608,6 +608,52 @@ h1, h2, h3, h4, h5, h6,
 
 .admin-body {
     background: #eef2f7;
+    color: #0f172a;
+}
+
+.admin-auth-shell {
+    min-height: 100vh;
+}
+
+.admin-body .admin-main,
+.admin-body .admin-content,
+.admin-body .admin-panel,
+.admin-body .admin-stat-card,
+.admin-body .admin-topbar {
+    color: #0f172a;
+}
+
+.admin-body .admin-topbar h1,
+.admin-body .admin-panel h1,
+.admin-body .admin-panel h2,
+.admin-body .admin-panel h3,
+.admin-body .admin-panel h4,
+.admin-body .admin-panel h5,
+.admin-body .admin-panel h6,
+.admin-body label,
+.admin-body th,
+.admin-body td {
+    color: #0f172a;
+}
+
+.admin-body .text-muted,
+.admin-body small.text-muted {
+    color: #64748b !important;
+}
+
+.admin-body .form-control,
+.admin-body .form-select {
+    background: #fff;
+    color: #0f172a;
+    border-color: #cbd5e1;
+}
+
+.admin-body .form-control::placeholder {
+    color: #94a3b8;
+}
+
+.admin-body .table {
+    color: #0f172a;
 }
 
 .admin-shell {
