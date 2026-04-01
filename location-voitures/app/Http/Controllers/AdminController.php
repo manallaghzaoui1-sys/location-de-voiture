@@ -14,6 +14,7 @@ use App\Services\CarSnapshotService;
 use App\Services\ContractFieldConfigService;
 use App\Services\ContractPdfService;
 use App\Services\ImageStorageService;
+use App\Services\ReservationNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -25,6 +26,7 @@ class AdminController extends Controller
         private readonly ContractPdfService $contractPdfService,
         private readonly ContractFieldConfigService $contractFieldConfigService,
         private readonly CarSnapshotService $carSnapshotService,
+        private readonly ReservationNotificationService $notificationService,
     ) {
         $this->middleware('auth:admin');
     }
@@ -188,14 +190,32 @@ class AdminController extends Controller
         $this->authorize('updateStatus', $reservation);
         $previousStatus = $reservation->statut;
         $reservation->update($validated);
+        $successMessage = 'Statut mis a jour avec succes.';
 
         if ($validated['statut'] === 'confirme' && $previousStatus !== 'confirme') {
             $reservation->loadMissing(['user', 'car', 'city']);
-            $pdfPath = $this->contractPdfService->generateAndStore($reservation);
-            $reservation->update(['contract_pdf_path' => $pdfPath]);
+
+            try {
+                $pdfPath = $this->contractPdfService->generateAndStore($reservation);
+                $reservation->update(['contract_pdf_path' => $pdfPath]);
+            } catch (\Throwable $exception) {
+                Log::error('Contract PDF generation failed during admin confirmation.', [
+                    'reservation_id' => $reservation->id,
+                    'contract_reference' => $reservation->contract_reference,
+                    'error' => $exception->getMessage(),
+                ]);
+
+                return back()->with('error', 'Reservation confirmee, mais la generation du contrat a echoue.');
+            }
+
+            if ($this->notificationService->sendReservationConfirmation($reservation)) {
+                $successMessage = 'Reservation confirmee, contrat genere et email client envoye.';
+            } else {
+                $successMessage = 'Reservation confirmee et contrat genere, mais email client non envoye.';
+            }
         }
 
-        return back()->with('success', 'Statut mis a jour avec succes.');
+        return back()->with('success', $successMessage);
     }
 
     public function citiesIndex()

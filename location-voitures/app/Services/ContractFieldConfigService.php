@@ -208,7 +208,7 @@ class ContractFieldConfigService
     private function resolveSource(string $source, Reservation $reservation): string
     {
         return match ($source) {
-            'app_name' => config('app.name', 'AutoLoc'),
+            'app_name' => 'Bouhila Car',
             'user_name' => (string) $reservation->user->name,
             'user_cin_permis' => ($reservation->user->cin ?? 'Non renseigne')
                 . ' / ' . ($reservation->user->numero_permis ?? 'Non renseigne'),

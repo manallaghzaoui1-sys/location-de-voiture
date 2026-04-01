@@ -89,7 +89,9 @@
                             </form>
                         </td>
                         <td>
-                            <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('admin.reservation.contract.download', now()->addMinutes(20), ['reservation' => $reservation->id]) }}" class="btn btn-sm btn-outline-primary mb-1">PDF</a>
+                            @if($reservation->statut === 'confirme' && $reservation->contract_pdf_path)
+                                <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('admin.reservation.contract.download', now()->addMinutes(20), ['reservation' => $reservation->id]) }}" class="btn btn-sm btn-outline-primary mb-1">PDF</a>
+                            @endif
                             @if($reservation->user->cin_document_path)
                                 <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('admin.users.documents.download', now()->addMinutes(20), ['user' => $reservation->user->id, 'type' => 'cin']) }}" class="btn btn-sm btn-outline-secondary mb-1">Doc CIN</a>
                             @endif

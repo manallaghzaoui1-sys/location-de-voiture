@@ -44,9 +44,13 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('reservations.contract.download', now()->addMinutes(20), ['reservation' => $reservation->id]) }}" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-file-pdf"></i> PDF
-                                    </a>
+                                    @if($reservation->statut === 'confirme' && $reservation->contract_pdf_path)
+                                        <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('reservations.contract.download', now()->addMinutes(20), ['reservation' => $reservation->id]) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-file-pdf"></i> T&eacute;l&eacute;charger le contrat
+                                        </a>
+                                    @else
+                                        <span class="badge bg-secondary">En attente</span>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

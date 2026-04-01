@@ -11,7 +11,6 @@ use App\Services\ReservationNotificationService;
 use App\Services\ReservationPricingService;
 use App\Services\UrlObfuscationService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class ReservationController extends Controller
 {
@@ -63,33 +62,15 @@ class ReservationController extends Controller
 
         $reservation->load(['user', 'car', 'city']);
 
-        try {
-            $pdfPath = $this->contractPdfService->generateAndStore($reservation);
-            $reservation->update(['contract_pdf_path' => $pdfPath]);
-            $reservation->refresh();
-        } catch (\Throwable $exception) {
-            Log::error('Contract PDF generation failed.', [
-                'reservation_id' => $reservation->id,
-                'error' => $exception->getMessage(),
-            ]);
-        }
-
-        $clientEmailSent = $this->notificationService->sendReservationConfirmation($reservation);
         $adminEmailSent = $this->notificationService->sendReservationAdminNotification($reservation);
 
         $message = 'Reservation enregistree.';
         $flashType = 'success';
 
-        if ($clientEmailSent && $adminEmailSent) {
-            $message = 'Reservation enregistree. Email de confirmation envoye au client et notification envoyee a l admin.';
-        } elseif ($clientEmailSent && ! $adminEmailSent) {
-            $message = 'Reservation enregistree. Email client envoye, notification admin non envoyee.';
-            $flashType = 'error';
-        } elseif (! $clientEmailSent && $adminEmailSent) {
-            $message = 'Reservation enregistree. Notification admin envoyee, email client non envoye.';
-            $flashType = 'error';
+        if ($adminEmailSent) {
+            $message = 'Reservation enregistree. L administrateur a ete notifie.';
         } else {
-            $message = 'Reservation enregistree, mais les emails n ont pas ete envoyes.';
+            $message = 'Reservation enregistree, mais la notification admin n a pas ete envoyee.';
             $flashType = 'error';
         }
 

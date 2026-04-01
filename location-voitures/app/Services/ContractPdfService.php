@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Reservation;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Storage;
 
 class ContractPdfService
@@ -21,7 +22,7 @@ class ContractPdfService
             'contractLinesBySection' => $this->fieldConfigService->buildLinesBySection($reservation),
         ]);
 
-        $relativePath = 'private/contracts/' . $reservation->contract_reference . '.pdf';
+        $relativePath = 'contracts/' . $reservation->contract_reference . '.pdf';
         Storage::disk('local')->put($relativePath, $pdf->output());
 
         return $relativePath;
@@ -30,8 +31,7 @@ class ContractPdfService
     public function downloadResponse(Reservation $reservation)
     {
         if (! $reservation->contract_pdf_path || ! Storage::disk('local')->exists($reservation->contract_pdf_path)) {
-            $relativePath = $this->generateAndStore($reservation);
-            $reservation->update(['contract_pdf_path' => $relativePath]);
+            throw (new ModelNotFoundException())->setModel(Reservation::class, [$reservation->id]);
         }
 
         return response()->download(

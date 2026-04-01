@@ -14,7 +14,9 @@ class ReservationPolicy
 
     public function downloadContract(User $user, Reservation $reservation): bool
     {
-        return $this->view($user, $reservation);
+        return $this->view($user, $reservation)
+            && $reservation->statut === 'confirme'
+            && ! empty($reservation->contract_pdf_path);
     }
 
     public function updateStatus(User $user): bool
@@ -22,4 +24,3 @@ class ReservationPolicy
         return $user->isAdmin();
     }
 }
-

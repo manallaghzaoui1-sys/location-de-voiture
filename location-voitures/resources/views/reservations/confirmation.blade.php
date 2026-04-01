@@ -20,9 +20,15 @@
                 </ul>
 
                 <div class="d-flex flex-wrap gap-2">
-                    <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('reservations.contract.download', now()->addMinutes(20), ['reservation' => $reservation->id]) }}" class="btn btn-primary">
-                        <i class="fas fa-file-pdf"></i> Telecharger le contrat PDF
-                    </a>
+                    @if($reservation->statut === 'confirme' && $reservation->contract_pdf_path)
+                        <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('reservations.contract.download', now()->addMinutes(20), ['reservation' => $reservation->id]) }}" class="btn btn-primary">
+                            <i class="fas fa-file-pdf"></i> T&eacute;l&eacute;charger le contrat
+                        </a>
+                    @else
+                        <span class="btn btn-outline-secondary disabled">
+                            <i class="fas fa-clock"></i> Contrat disponible apres confirmation admin
+                        </span>
+                    @endif
                     <a href="{{ route('reservations.user') }}" class="btn btn-outline-secondary">Mes reservations</a>
                     <a href="{{ route('home') }}" class="btn btn-outline-secondary">Accueil</a>
                 </div>

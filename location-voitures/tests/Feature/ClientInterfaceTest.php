@@ -8,6 +8,7 @@ use App\Models\Reservation;
 use App\Models\User;
 use App\Services\UrlObfuscationService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
@@ -87,6 +88,8 @@ class ClientInterfaceTest extends TestCase
 
     public function test_contract_download_requires_signed_url(): void
     {
+        Storage::fake('local');
+
         $user = User::factory()->create([
             'role' => 'client',
             'cin' => 'ZZ111111',
@@ -118,7 +121,10 @@ class ClientInterfaceTest extends TestCase
             'frais_deplacement' => 90,
             'statut' => 'confirme',
             'contract_reference' => 'CTR-SIGNED-URL-001',
+            'contract_pdf_path' => 'contracts/CTR-SIGNED-URL-001.pdf',
         ]);
+
+        Storage::disk('local')->put($reservation->contract_pdf_path, 'dummy-pdf-content');
 
         $this->actingAs($user, 'web');
 
